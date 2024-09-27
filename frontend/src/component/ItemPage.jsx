@@ -22,7 +22,7 @@ const itemsData = {
   ],
 };
 
-function Item() {
+function ItemPage() {
   const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
   const [items, setItems] = useState(itemsData[selectedCategory]);
   const navigate=useNavigate()
@@ -98,4 +98,4 @@ function Item() {
   );
 }
 
-export default Item;
+export default ItemPage;

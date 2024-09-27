@@ -10,7 +10,9 @@ import ItemDetailPage from './component/Pages/ItemDetailPage'
 import Signup from './component/Pages/Signup'
 import Login from './component/Pages/login'
 import UserProfile from './component/Pages/Profile'
-import Item from './component/Pages/item'
+import ItemPage from './component/ItemPage'
+
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,7 +24,7 @@ function App() {
       <Routes>
         <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path='/additem' element={<AddItemPage/>}/>
-        <Route path='/item' element={<Item/>}/>
+        <Route path='/item' element={<ItemPage/>}/>
         <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/login' element={<Login/>}/>
