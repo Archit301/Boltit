@@ -38,7 +38,7 @@ function ItemPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start p-5 bg-gray-100 min-h-screen">
+    <div className="flex flex-col items-center justify-start p-5  bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen">
       <h1 className="text-4xl font-bold text-blue-800 mb-8">Items</h1>
       
       <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-md mx-auto">
