@@ -152,8 +152,9 @@ export default function Signup() {
             </p>
           </div>
         </form>
+        {error && <p className='text-red-500 mt-5'>{error}</p>}
       </div>
-      {error && <p className='text-red-500 mt-5'>{error}</p>}
+      
     </div>
   );
 }

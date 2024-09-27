@@ -8,6 +8,7 @@ import Dashboard from './component/Pages/Dashboard'
 import AddItemPage from './component/Pages/AddItemPage'
 import ItemDetailPage from './component/Pages/ItemDetailPage'
 import Signup from './component/Pages/Signup'
+import Login from './component/Pages/login'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -21,6 +22,7 @@ function App() {
         <Route path='/add-item' element={<AddItemPage/>}/>
         <Route path='/item' element={<ItemDetailPage/>}/>
         <Route path='/signup' element={<Signup/>}/>
+        <Route path='/login' element={<Login/>}/>
       </Routes>
     </BrowserRouter>
     </>
