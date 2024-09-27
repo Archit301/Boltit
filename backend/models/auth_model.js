@@ -17,14 +17,14 @@ const userSchema=mongoose.Schema({
     avatar:{
         type:String
     },
-    contactInfo: {
-        phone: { type: String },
-        address: { type: String },
-        location: {
-          latitude: { type: Number },
-          longitude: { type: Number }
-        }
-    },
+    phone: 
+    { 
+        type: String
+     },
+address: {
+     type: String
+     },
+
     averageRating:{ 
         type: Number, 
         default: 0 },  

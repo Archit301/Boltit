@@ -9,6 +9,8 @@ import AddItemPage from './component/Pages/AddItemPage'
 import ItemDetailPage from './component/Pages/ItemDetailPage'
 import Signup from './component/Pages/Signup'
 import Login from './component/Pages/login'
+import UserProfile from './component/Pages/Profile'
+import Item from './component/Pages/item'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -19,8 +21,9 @@ function App() {
       <Navbar/>
       <Routes>
         <Route path='/dashboard' element={<Dashboard/>}/>
-        <Route path='/add-item' element={<AddItemPage/>}/>
-        <Route path='/item' element={<ItemDetailPage/>}/>
+        <Route path='/additem' element={<AddItemPage/>}/>
+        <Route path='/item' element={<Item/>}/>
+        <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/login' element={<Login/>}/>
       </Routes>
