@@ -11,6 +11,7 @@ import Signup from './component/Pages/Signup'
 import Login from './component/Pages/login'
 import UserProfile from './component/Pages/Profile'
 import ItemPage from './component/ItemPage'
+import NotificationBell from './component/NotificationBell'
 
 
 
@@ -22,11 +23,13 @@ function App() {
     <BrowserRouter>
       <Navbar/>
       <Routes>
+      <Route path='/' element={<Dashboard/>}/>
         <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path='/additem' element={<AddItemPage/>}/>
         <Route path='/item' element={<ItemPage/>}/>
         <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/signup' element={<Signup/>}/>
+        <Route path='/notifications' element={<NotificationBell/>}/>
         <Route path='/login' element={<Login/>}/>
       </Routes>
     </BrowserRouter>

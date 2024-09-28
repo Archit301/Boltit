@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import myImage from '../assets/logo.jpg';
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +12,19 @@ const Navbar = () => {
   const dispatch=useDispatch()
   // State for notification count
   const [notificationCount, setNotificationCount] = useState(0);
-
+   useEffect(()=>{
+    const NotificationCount=async()=>{
+      try {
+        const response=await fetch(`/backend/notification/count/${currentUser._id}`)
+        //  console.log(response)
+         const data=await response.json();
+         setNotificationCount(data.count)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    NotificationCount()
+   },[currentUser])
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -56,7 +68,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center space-x-4">
-            <Link to="/" className="flex-shrink-0 flex items-center">
+            <Link to="/dashboard" className="flex-shrink-0 flex items-center">
               <img className="h-10 w-auto" src={myImage} alt="BorrowIt Logo" />
               <span className="ml-2 font-bold text-2xl">BorrowIt</span>
             </Link>

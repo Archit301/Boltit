@@ -8,7 +8,7 @@ const notificationSchema = new mongoose.Schema({
         required: true },  // Reference to the user receiving the notification
     type: { 
         type: String, 
-        enum: ['request_approved', 'request_rejected', 'reminder'], 
+        enum: ['request', 'reminder', 'profile'],
         required: true }, // Type of notification
     message: { 
         type: String, 

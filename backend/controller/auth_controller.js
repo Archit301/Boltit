@@ -2,6 +2,8 @@ import { User } from "../models/auth_model.js"
 import jwt from "jsonwebtoken"
 import bcryptjs from "bcryptjs"
 import { errorHandler } from "../utils/error.js";
+import axios from "axios"
+import { profileUpdateNotification } from "./notification_controller.js";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -91,31 +93,151 @@ export const signout=async(req,res,next)=>{
 
 
 
+export const updateUser = async (req, res, next) => {
+  const userId=req.params.id
+  try {
+    // Hash password if provided
+    if (req.body.password) {
+      req.body.password = bcryptjs.hashSync(req.body.password, 10);
+    }
 
+    // Check if address is provided
+    if (req.body.address) {
+      const address = req.body.address; // Define address
 
-export const updateUser=async(req,res,next)=>{
-   try {
-      if(req.body.password)
-      {
-          req.body.password = bcryptjs.hashSync(req.body.password, 10); 
+      // Make API call to geocode.xyz
+      const response = await axios.get('https://geocode.xyz/', {
+        params: {
+          auth: '112704341054483e15827224x55307',
+          locate: address,
+          json: 1,
+        },
+        timeout: 5000, // Optional: set timeout
+      });
+
+      console.log('Geocode.xyz Response:', response.data);
+
+      // Check for API errors
+      if (response.data.error) {
+        return res.status(400).json({ error: response.data.error.description });
       }
-      const updatedUser=await User.findByIdAndUpdate(
-          req.params.id,
-          {
-              $set: {
-                  username: req.body.username,
-                  email: req.body.email,
-                  password: req.body.password,
-                  avatar: req.body.avatar,
-                  address:req.body.address,
-                  phone:req.body.phone
-                }, 
+
+      const { latt, longt } = response.data;
+
+      // Validate latitude and longitude
+      if (!latt || !longt) {
+        return res.status(400).json({ error: 'Unable to retrieve coordinates.' });
+      }
+
+      // Update the location field as GeoJSON
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+            avatar: req.body.avatar,
+            address: req.body.address,
+            phone: req.body.phone,
+            location: {
+              type: 'Point',
+              coordinates: [parseFloat(longt), parseFloat(latt)], // [longitude, latitude]
+            },
           },
-          { new: true }
-      )  
-      const { password, ...rest } = updatedUser._doc;  
+        },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found.' });
+      }
+
+      const { password, ...rest } = updatedUser._doc;
+      await profileUpdateNotification(userId);
+      return res.status(200).json(rest);
+    } else {
+      // Update without location
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+            avatar: req.body.avatar,
+            address: req.body.address,
+            phone: req.body.phone,
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found.' });
+      }
+
+      const { password, ...rest } = updatedUser._doc;
+      await profileUpdateNotification(userId);
       res.status(200).json(rest);
-   } catch (error) {
-      next(error); 
-   }
+    }
+  } catch (error) {
+    console.error('Update User Error:', error);
+    next(error);
   }
+};
+
+
+
+export const searchNearbyUsers = async (req, res, next) => {
+  try {
+    const { longitude, latitude, searchItem, distance=50000 } = req.body;
+
+    // Validate the request body
+    if (!longitude || !latitude || !searchItem || !distance) {
+      return res.status(400).json({ message: 'Longitude, latitude, search item, and distance are required.' });
+    }
+
+    // Geospatial query to find users near the given location
+    const nearbyUsersWithItems = await User.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [longitude, latitude], // User's location from request body
+          },
+          distanceField: 'distance', // Field to store calculated distance
+          maxDistance: 500000000, // Predefined maximum distance from request
+          spherical: true, // Use spherical calculations for accuracy
+        },
+      },
+      {
+        $lookup: {
+          from: 'items', // Name of the Item collection
+          localField: '_id', // User's unique ID field in User collection
+          foreignField: 'userId', // Field in Item collection that relates to the User
+          as: 'items', // Alias for the joined data
+        },
+      },
+      {
+        $match: {
+          'itemsName': searchItem, // Filter users whose items include the search item
+        },
+      },
+      {
+        $limit: 10, // Limit the number of results to avoid too many responses
+      },
+    ]);
+
+    // Check if any users are found with the searched item
+    if (nearbyUsersWithItems.length === 0) {
+      return res.status(404).json({ message: 'No users with the specified item found nearby.' });
+    }
+
+    // Return the list of nearby users along with their items
+    return res.status(200).json(nearbyUsersWithItems);
+  } catch (error) {
+    console.error('Error in geospatial query:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

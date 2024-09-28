@@ -24,7 +24,17 @@ const userSchema=mongoose.Schema({
 address: {
      type: String
      },
-
+ location: {
+     type: {
+       type: String, // Must be 'Point'
+       enum: ['Point'],
+       required: false,
+        },
+    coordinates: {
+     type: [Number], // [longitude, latitude]
+      required: false,
+      },
+    },
     averageRating:{ 
         type: Number, 
         default: 0 },  
