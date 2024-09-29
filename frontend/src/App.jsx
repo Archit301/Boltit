@@ -12,6 +12,10 @@ import Login from './component/Pages/login'
 import UserProfile from './component/Pages/Profile'
 import ItemPage from './component/ItemPage'
 import NotificationBell from './component/NotificationBell'
+import Footer from './component/Pages/Footer'
+import About from './component/Pages/About'
+import Contact from './component/Pages/Contact'
+// import UpdateItempage from './component/Pages/UpdateItempage'
 
 
 
@@ -21,7 +25,12 @@ function App() {
   return (
     <>
     <BrowserRouter>
-      <Navbar/>
+    <div className="flex flex-col min-h-screen">
+      
+        <Navbar />
+
+        
+        <main className="flex-grow">
       <Routes>
       <Route path='/' element={<Dashboard/>}/>
         <Route path='/dashboard' element={<Dashboard/>}/>
@@ -30,8 +39,16 @@ function App() {
         <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/notifications' element={<NotificationBell/>}/>
+        {/* <Route path='/updateitem'    element={<UpdateItempage/>}/> */}
         <Route path='/login' element={<Login/>}/>
-      </Routes>
+        <Route path='/about'  element={<About/>}/>
+        <Route path='/contact'  element={<Contact/>}/>
+              </Routes>
+              </main>
+<Footer />
+</div>
+
+    
     </BrowserRouter>
     </>
   )

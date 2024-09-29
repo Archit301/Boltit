@@ -22,10 +22,10 @@ const itemSchema = new mongoose.Schema({
         longitude: { type: Number },
         address: { type: String }
       },
-    availability: {
+    // availability: {
         fromDate: { type: Date, required: true },
-        toDate: { type: Date, required: true }
-      },
+        toDate: { type: Date, required: true },
+    //   },
     images: [{
          type: String
          }],  
