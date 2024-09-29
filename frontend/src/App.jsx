@@ -15,6 +15,7 @@ import NotificationBell from './component/NotificationBell'
 import Footer from './component/Pages/Footer'
 import About from './component/Pages/About'
 import Contact from './component/Pages/Contact'
+import ItemCard from './component/ItemCard'
 // import UpdateItempage from './component/Pages/UpdateItempage'
 
 
@@ -42,6 +43,7 @@ function App() {
         {/* <Route path='/updateitem'    element={<UpdateItempage/>}/> */}
         <Route path='/login' element={<Login/>}/>
         <Route path='/about'  element={<About/>}/>
+        <Route path='/itemcard'  element={<ItemCard/>}/>
         <Route path='/contact'  element={<Contact/>}/>
               </Routes>
               </main>

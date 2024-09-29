@@ -35,10 +35,11 @@ export const deleteitem=async(req,res,next)=>{
 
 
 export const itemlisting=async(req,res,next)=>{
-    const {id}=req.body
+    const {ownerId}=req.params;
+    // console.log(ownerId)
 try {
-    const item=await Item.find({id})
-    res.status(200).json({item})
+    const item=await Item.find({ownerId})
+    res.status(200).json(item)
 } catch (error) {
     next(error);
 }

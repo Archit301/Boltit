@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import ItemCard from './ItemCard';
+import { useSelector } from 'react-redux';
 
 const categories = [
   { id: 1, name: 'Electronics' },
@@ -7,25 +9,25 @@ const categories = [
   { id: 3, name: 'Books' },
 ];
 
-const itemsData = {
-  1: [
-    { id: 1, name: 'Laptop', description: 'High performance laptop', price: 999 },
-    { id: 2, name: 'Smartphone', description: 'Latest model smartphone', price: 799 },
-  ],
-  2: [
-    { id: 3, name: 'T-shirt', description: '100% cotton t-shirt', price: 29 },
-    { id: 4, name: 'Jeans', description: 'Stylish denim jeans', price: 49 },
-  ],
-  3: [
-    { id: 5, name: 'JavaScript Book', description: 'Learn JavaScript', price: 39 },
-    { id: 6, name: 'CSS Book', description: 'Master CSS techniques', price: 29 },
-  ],
-};
 
 function ItemPage() {
   const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
-  const [items, setItems] = useState(itemsData[selectedCategory]);
+  const [items, setItems] = useState([]);
   const navigate=useNavigate()
+  const { currentUser } = useSelector((state) => state.user);
+  useEffect(()=>{
+    const listing=async()=>{
+      try {
+        const res=await fetch(`/backend/item/list/${currentUser._id}`)
+        const data=await res.json();
+        console.log(data)
+        setItems(data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    listing();
+  },[])
 
   const handleCategoryChange = (event) => {
     const categoryId = Number(event.target.value);
@@ -72,13 +74,12 @@ function ItemPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {items.length > 0 ? (
             items.map(item => (
-              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{item.name}</h3>
-                  <p className="text-gray-600 mb-2">{item.description}</p>
-                  <span className="text-lg font-semibold text-gray-800">${item.price}</span>
-                </div>
-              </div>
+              <ItemCard
+              key={item.id}
+              item={item}
+              onEdit={() => handleEdit(item._id)}
+              onDelete={() => handleDelete(item._id)}
+          />
             ))
           ) : (
             <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4 flex items-center justify-center h-64 bg-white border border-gray-300 rounded-lg shadow-md p-6 mx-4">
