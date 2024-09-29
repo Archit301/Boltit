@@ -9,25 +9,25 @@ const categories = [
   { id: 3, name: 'Books' },
 ];
 
-
 function ItemPage() {
   const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
   const [items, setItems] = useState([]);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
-  useEffect(()=>{
-    const listing=async()=>{
+
+  useEffect(() => {
+    const listing = async () => {
       try {
-        const res=await fetch(`/backend/item/list/${currentUser._id}`)
-        const data=await res.json();
-        console.log(data)
-        setItems(data)
+        const res = await fetch(`/backend/item/list/${currentUser._id}`);
+        const data = await res.json();
+        console.log(data);
+        setItems(data);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
+    };
     listing();
-  },[])
+  }, []);
 
   const handleCategoryChange = (event) => {
     const categoryId = Number(event.target.value);
@@ -36,11 +36,11 @@ function ItemPage() {
   };
 
   const handleAddItem = () => {
-    navigate('/additem')
+    navigate('/additem');
   };
 
   return (
-    <div className="flex flex-col items-center justify-start p-5  bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen">
+    <div className="flex flex-col items-center justify-start p-5 bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen">
       <h1 className="text-4xl font-bold text-blue-800 mb-8">Items</h1>
       
       <div className="w-full max-w-6xl bg-white p-6 rounded-lg shadow-md mx-auto">
@@ -75,11 +75,11 @@ function ItemPage() {
           {items.length > 0 ? (
             items.map(item => (
               <ItemCard
-              key={item.id}
-              item={item}
-              onEdit={() => handleEdit(item._id)}
-              onDelete={() => handleDelete(item._id)}
-          />
+                key={item.id}
+                item={item}
+                onEdit={() => handleEdit(item._id)}
+                onDelete={() => handleDelete(item._id)}
+              />
             ))
           ) : (
             <div className="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4 flex items-center justify-center h-64 bg-white border border-gray-300 rounded-lg shadow-md p-6 mx-4">

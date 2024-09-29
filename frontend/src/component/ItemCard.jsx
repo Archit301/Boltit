@@ -2,17 +2,17 @@ import React from 'react';
 
 const ItemCard = ({ item, onEdit, onDelete }) => {
     return (
-        <div className="max-w-xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 p-5"> {/* Increased width */}
+        <div className="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 p-5"> {/* Increased width */}
             <img
                 src={item.images[0] || "https://via.placeholder.com/400"}
                 alt={item.description}
-                className="w-full h-56 object-cover rounded-lg mb-4" // Reduced height for better visibility
+                className="w-full h-48 object-cover rounded-lg mb-4" // Keep adjusted height
             />
             <div className="flex flex-col">
                 <h2 className="text-xl font-bold text-gray-800 mb-2">{item.itemName}</h2>
                 <p className="text-gray-600 mb-2">{item.description}</p>
                 <p className="text-gray-500 text-sm mb-1">{item.category}</p>
-                <p className="text-gray-800 font-semibold mt-2 text-lg">${item.price}</p> {/* Fixed to 2 decimal places */}
+                <p className="text-gray-800 font-semibold mt-2 text-lg">${item.price}</p>
                 
                 <div className="flex justify-between mt-4">
                     <button
