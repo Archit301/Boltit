@@ -76,13 +76,14 @@ function ItemPage() {
         {/* Top Section: Add Item Button and Category Dropdown */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
           {/* Add Item Button */}
-          <button
+          {currentUser  ?
+          (<button
             onClick={handleAddItem}
             className="bg-blue-700 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-300"
           >
             Add Item
-          </button>
-
+          </button>):('')
+}
           {/* Category Dropdown */}
           <div className="w-full md:w-auto">
             <label htmlFor="category" className="block text-lg font-semibold text-gray-700 mb-2">

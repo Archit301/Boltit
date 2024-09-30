@@ -110,12 +110,17 @@ const Navbar = () => {
 
           {/* Right Section: Notifications and User Profile */}
           <div className="hidden md:flex items-center space-x-4">
+          {currentUser ? (
+              <>
           <Link
                 to="/my-item"
                 className="hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
               >
                 My Item
               </Link>
+              </> ):('')}
+              {currentUser ? (
+              <>
             {/* Notifications Icon */}
             <Link to="/notifications" className="hover:bg-blue-700 p-2 rounded-md relative" aria-label="Notifications">
               <span className="text-2xl">🔔</span>
@@ -125,7 +130,7 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-
+           </> ):('')}
           
             {currentUser ? (
               <>
@@ -215,7 +220,8 @@ const Navbar = () => {
                 {path.replace('/', '').replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}
               </Link>
             ))}
-
+           { currentUser ? (
+          <>
             {/* New "My Item" Link */}
             <Link
               to="/my-item"
@@ -224,7 +230,9 @@ const Navbar = () => {
             >
               My Item
             </Link>
-
+            </>  ):('')}
+        { currentUser ? (
+          <>
             {/* Notifications Icon in Mobile View */}
             <Link to="/notifications" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 transition-all duration-200 relative" aria-label="Notifications">
               <span className="text-2xl">🔔</span>
@@ -234,7 +242,9 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-
+            </>
+        ):('')
+}
             {currentUser ? (
               <>
                 <Link

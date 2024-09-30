@@ -75,3 +75,13 @@ export const allitemlisting=async(req,res,next)=>{
         next(error)
     }
 }
+
+
+export const withoutloginallitemlisting=async(req,res,next)=>{
+    try {
+        const items = await Item.find()
+        res.status(200).json(items)
+    } catch (error) {
+        next(error)
+    }
+}

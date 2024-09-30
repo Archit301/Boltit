@@ -35,10 +35,15 @@ const Item = () => {
       }
 
       // Make GET request to the backend with query parameters
+      if(currentUser){
       const response = await axios.get(`/backend/item/allitem/${currentUser._id}`, { params });
-
-      // Set items with the fetched data
       setItems(response.data);
+    }
+      else{
+        const response=await axios.get('/backend/item/withloginlistitem')
+        setItems(response.data);
+      }
+      // Set items with the fetched data
     } catch (err) {
       console.error('Error fetching items:', err);
       setError('Failed to fetch items.');
