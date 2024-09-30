@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Item } from "../models/item_model.js"
 
 export const Additem=async(req,res,next)=>{
@@ -22,11 +23,20 @@ export const updateitem=async(req,res,next)=>{
 
 
 export const deleteitem=async(req,res,next)=>{
+    const {id}=req.body;
     try {
-        const deleteitem=await Item.deletebyId(req.body)
-
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid ID format' });
+        }
+        const deleteitem=await Item.findById(id);
+        if (!deleteitem) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+        const result = await Item.findByIdAndDelete(id);
+        res.status(200).json({ message: 'Item has been deleted' }); 
     } catch (error) {
-        
+        console.error('Error updating user:', error);
+        res.status(500).json({ message: 'Internal server error' });       
     }
 }
 
@@ -56,3 +66,12 @@ export const rentitemlisting=async(req,res,next)=>{
 }
 
 
+export const allitemlisting=async(req,res,next)=>{
+    const {ownerId}=req.params;
+    try {
+        const items = await Item.find({ ownerId: { $ne: ownerId } });
+        res.status(200).json(items)
+    } catch (error) {
+        next(error)
+    }
+}

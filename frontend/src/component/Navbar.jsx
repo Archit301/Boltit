@@ -9,22 +9,24 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
   // State for notification count
   const [notificationCount, setNotificationCount] = useState(0);
-   useEffect(()=>{
-    const NotificationCount=async()=>{
+
+  useEffect(() => {
+    const NotificationCount = async () => {
+      if (!currentUser) return; // Prevent fetching if no user is logged in
       try {
-        const response=await fetch(`/backend/notification/count/${currentUser._id}`)
-        //  console.log(response)
-         const data=await response.json();
-         setNotificationCount(data.count)
+        const response = await fetch(`/backend/notification/count/${currentUser._id}`);
+        const data = await response.json();
+        setNotificationCount(data.count);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
-    NotificationCount()
-   },[currentUser])
+    };
+    NotificationCount();
+  }, [currentUser]);
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -40,39 +42,40 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
-  const handleLogout =async () => {
+  const handleLogout = async () => {
     try {
       dispatch(signOutUserStart());
       const res = await fetch('/backend/auth/signout', {
-          method: 'POST', // Ensure POST method
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-    const data = await res.json();
-    console.log(data)
-    if(data.success === false){
-      dispatch(signOutUserFailure(data.message));
-      return;
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signOutUserFailure(data.message));
+        return;
+      }
+      dispatch(signOutUserSuccess(data));
+      navigate('/login');
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message || "Logout failed"));
+      console.log(error);
     }
-    dispatch(signOutUserSuccess(data));
-    navigate('/login');
-  } catch (error) {
-      dispatch(signOutUserFailure(data.message));
-  seterror(error)
-  }
   };
 
   return (
     <nav className="bg-blue-600 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
+          {/* Left Section: Logo and Navigation Links */}
           <div className="flex items-center space-x-4">
             <Link to="/dashboard" className="flex-shrink-0 flex items-center">
               <img className="h-10 w-auto" src={myImage} alt="BorrowIt Logo" />
               <span className="ml-2 font-bold text-2xl">BorrowIt</span>
             </Link>
             <div className="hidden md:flex space-x-6 items-center">
+              {/* Existing Navigation Links */}
               {['/dashboard', '/item', '/borrow-history'].map((path, index) => (
                 <Link
                   key={index}
@@ -82,6 +85,9 @@ const Navbar = () => {
                   {path.replace('/', '').replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}
                 </Link>
               ))}
+
+              {/* New "My Item" Link */}
+
               {/* Search Bar */}
               <form onSubmit={handleSearchSubmit} className="relative">
                 <input
@@ -102,15 +108,25 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* User Profile and Notifications */}
+          {/* Right Section: Notifications and User Profile */}
           <div className="hidden md:flex items-center space-x-4">
+          <Link
+                to="/my-item"
+                className="hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
+              >
+                My Item
+              </Link>
             {/* Notifications Icon */}
             <Link to="/notifications" className="hover:bg-blue-700 p-2 rounded-md relative" aria-label="Notifications">
               <span className="text-2xl">🔔</span>
               {notificationCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">{notificationCount}</span>
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                  {notificationCount}
+                </span>
               )}
             </Link>
+
+          
             {currentUser ? (
               <>
                 <Link to="/profile" className="flex items-center p-0" aria-label="Profile">
@@ -188,6 +204,7 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-blue-600">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {/* Existing Navigation Links */}
             {['/dashboard', '/item', '/borrow-history'].map((path, index) => (
               <Link
                 key={index}
@@ -198,11 +215,23 @@ const Navbar = () => {
                 {path.replace('/', '').replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}
               </Link>
             ))}
+
+            {/* New "My Item" Link */}
+            <Link
+              to="/my-item"
+              onClick={() => setIsOpen(false)}
+              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 transition-all duration-200"
+            >
+              My Item
+            </Link>
+
             {/* Notifications Icon in Mobile View */}
             <Link to="/notifications" className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 transition-all duration-200 relative" aria-label="Notifications">
               <span className="text-2xl">🔔</span>
               {notificationCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">{notificationCount}</span>
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                  {notificationCount}
+                </span>
               )}
             </Link>
 
@@ -219,6 +248,7 @@ const Navbar = () => {
                     alt="Profile"
                     className="h-8 w-8 rounded-full object-cover mr-2"
                   />
+                  Profile
                 </Link>
                 <button
                   onClick={() => {

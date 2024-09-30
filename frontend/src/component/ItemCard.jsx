@@ -1,6 +1,26 @@
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 const ItemCard = ({ item, onEdit, onDelete }) => {
+ 
+ const navigate=useNavigate()
+    const handleDelete=async()=>{
+        try {
+            await onDelete(item._id);  
+        } catch (error) {
+            console.error('Error handling delete:', error);     
+        }
+    }
+
+   const handleEdit=async()=>{
+    navigate(`/edit/${item._id}`)
+   }
+
+  const handleImageClick = (e) => {
+    e.stopPropagation();
+  }
+
+  
     return (
         <div className="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 p-5"> {/* Increased width */}
             <img
@@ -16,13 +36,13 @@ const ItemCard = ({ item, onEdit, onDelete }) => {
                 
                 <div className="flex justify-between mt-4">
                     <button
-                        onClick={onEdit}
+                      onClick={(e) => { handleImageClick(e); handleEdit()}}
                         className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 shadow hover:shadow-lg"
                     >
                         Edit
                     </button>
                     <button
-                        onClick={onDelete}
+                          onClick={ (e) => { handleImageClick(e); handleDelete()}}
                         className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200 shadow hover:shadow-lg"
                     >
                         Delete

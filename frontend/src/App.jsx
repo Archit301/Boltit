@@ -16,7 +16,8 @@ import Footer from './component/Pages/Footer'
 import About from './component/Pages/About'
 import Contact from './component/Pages/Contact'
 import ItemCard from './component/ItemCard'
-// import UpdateItempage from './component/Pages/UpdateItempage'
+import UpdateItempage from './component/Pages/UpdateItempage'
+import Item from './component/Item'
 
 
 
@@ -36,11 +37,13 @@ function App() {
       <Route path='/' element={<Dashboard/>}/>
         <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path='/additem' element={<AddItemPage/>}/>
-        <Route path='/item' element={<ItemPage/>}/>
+        <Route path='/my-item' element={<ItemPage/>}/>
         <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/notifications' element={<NotificationBell/>}/>
-        {/* <Route path='/updateitem'    element={<UpdateItempage/>}/> */}
+         <Route path='/edit/:itemId'    element={<UpdateItempage/>}/> 
+         <Route path='/detail/:itemId'    element={<ItemDetailPage/>}/> 
+         <Route path='/item'  element={<Item/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/about'  element={<About/>}/>
         <Route path='/itemcard'  element={<ItemCard/>}/>
