@@ -18,6 +18,7 @@ import Contact from './component/Pages/Contact'
 import ItemCard from './component/ItemCard'
 import UpdateItempage from './component/Pages/UpdateItempage'
 import Item from './component/Item'
+import Cart from './component/Pages/Cart'
 
 
 
@@ -46,6 +47,7 @@ function App() {
          <Route path='/item'  element={<Item/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/about'  element={<About/>}/>
+        <Route path='/cart'  element={<Cart/>}/>
         <Route path='/itemcard'  element={<ItemCard/>}/>
         <Route path='/contact'  element={<Contact/>}/>
               </Routes>

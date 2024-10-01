@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 
-const ItemCard = ({ item, onEdit, onDelete }) => {
+const ItemCard = ({ item, onEdit, onDelete,onClick }) => {
  
  const navigate=useNavigate()
     const handleDelete=async()=>{
@@ -20,9 +20,14 @@ const ItemCard = ({ item, onEdit, onDelete }) => {
     e.stopPropagation();
   }
 
+  const handleViewTicket = (itemId) => {
+    navigate(`/detail/${itemId}`);
+  };
+
   
     return (
-        <div className="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 p-5"> {/* Increased width */}
+        <div   onClick={onClick}
+         className="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 p-5"> {/* Increased width */}
             <img
                 src={item.images[0] || "https://via.placeholder.com/400"}
                 alt={item.description}

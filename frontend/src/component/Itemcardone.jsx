@@ -1,8 +1,14 @@
 import React from 'react'
+import { useNavigate } from 'react-router';
 
-const Itemcardone = ({item}) => {
+const Itemcardone = ({item,onClick}) => {
+  const navigate=useNavigate()
+  const handleViewTicket = (itemId) => {
+    navigate(`/detail/${itemId}`);
+  };
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 p-5 hover:shadow-2xl">
+    <div onClick={() => handleViewTicket(item._id)}
+     className="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 p-5 hover:shadow-2xl">
     {/* Image */}
     <img
       src={item.images[0] || "https://via.placeholder.com/400"}

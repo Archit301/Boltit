@@ -1,34 +1,124 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [refresh, setRefresh] = useState(false); // Add refresh state
+  const { currentUser } = useSelector((state) => state.user);
 
   // Fetch data from backend
   useEffect(() => {
-    axios.get('/api/pending-requests') // Replace with your actual API endpoint
-      .then(response => {
-        const data = Array.isArray(response.data) ? response.data : [];
+    const pendinglist = async () => {
+      try {
+        const res = await fetch(`/backend/request/pending/66f6e2e4b469530995123480`);
+        const data = await res.json();
         setPendingRequests(data);
-      })
-      .catch(error => {
-        console.error('Error fetching pending requests:', error);
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    pendinglist();
+  }, [refresh]); // Depend on refresh to re-run useEffect
+
+  const RequestDateComponent = ({ requestDate }) => {
+    const date = new Date(requestDate);
+    let formattedDate;
+    if (!isNaN(date.getTime())) {
+      formattedDate = date.toLocaleDateString(); // Format date
+    } else {
+      formattedDate = 'Invalid date';
+    }
+    return <span className="font-medium">{formattedDate}</span>;
+  };
+
+  const acceptRequest = async (id) => {
+    try {
+      const res = await fetch(`/backend/request/accept`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }), // Send the request ID as an object
       });
-  }, []);
+      const data = await res.json();
+      console.log(data);
+      setRefresh(!refresh); // Toggle refresh to trigger useEffect
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const declineRequest = async (id) => {
+    try {
+      const res = await fetch(`/backend/request/decline`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }), // Send the request ID as an object
+      });
+      const data = await res.json();
+      console.log(data);
+      setRefresh(!refresh); // Toggle refresh to trigger useEffect
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <ul className="space-y-6">
-      {pendingRequests.map(request => (
-        <li key={request.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 hover:bg-yellow-100 transition">
+      {pendingRequests.map((request) => (
+        <li key={request._id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 hover:bg-yellow-100 transition">
           <div className="flex items-center">
             {/* Display request item image */}
-            <img src={request.imageUrl} alt={request.itemName} className="w-16 h-16 rounded object-cover mr-4" />
+            <img
+              src={request.itemId.images[0]}
+              alt={request.itemId.itemName}
+              className="w-16 h-16 rounded object-cover mr-4"
+            />
             <div>
-              <h3 className="font-semibold text-lg text-gray-700">{request.itemName}</h3>
-              <p className="text-sm text-gray-500">Requested by: <span className="font-medium">{request.requester}</span></p>
-              <button className="mt-4 px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition">
-                Approve Request
-              </button>
+              <h3 className="font-semibold text-lg text-gray-700">
+                Item Name: {request.itemId.itemName}
+              </h3>
+              <p className="text-sm text-gray-500">
+                Requested by: <span className="font-medium">{request.borrowerId.username}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Date: <RequestDateComponent requestDate={request.requestDate} />
+              </p>
+
+              {/* Buttons container for mobile */}
+              <div className="flex space-x-2 mt-4 md:hidden">
+                <button
+                  onClick={() => acceptRequest(request._id)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition"
+                >
+                  Approve Request
+                </button>
+                <button
+                  onClick={() => declineRequest(request._id)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition"
+                >
+                  Decline Request
+                </button>
+              </div>
+
+              {/* Buttons for larger screens */}
+              <div className="hidden md:flex space-x-2 mt-4">
+                <button
+                  onClick={() => acceptRequest(request._id)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition"
+                >
+                  Approve Request
+                </button>
+                <button
+                  onClick={() => declineRequest(request._id)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition"
+                >
+                  Decline Request
+                </button>
+              </div>
             </div>
           </div>
         </li>

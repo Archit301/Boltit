@@ -5,6 +5,7 @@ import path from "path"
 import userRouter from "./routes/auth_route.js"
 import notificationRouter from "./routes/notification_route.js"
 import itemRouter from "./routes/item_route.js"
+import requestRouter from "./routes/request_route.js"
 import dotenv  from  "dotenv"
 dotenv.config()
 
@@ -26,6 +27,7 @@ app.listen(PORT,()=>{
 app.use('/backend/auth',userRouter)
 app.use('/backend/notification',notificationRouter)
 app.use('/backend/item',itemRouter)
+app.use('/backend/request',requestRouter)
 app.use(express.static(path.join(__dirname, '/frontend/dist')));
 
 app.get('*', (req, res) => {

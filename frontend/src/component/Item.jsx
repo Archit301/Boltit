@@ -19,6 +19,7 @@ const Item = () => {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate(); // Use navigate at the top level
 
+
   // Function to fetch items from the backend with sorting and filtering
   const fetchItems = async () => {
     try {
@@ -81,6 +82,11 @@ const Item = () => {
     );
   }
 
+
+  const handleViewTicket = (itemId) => {
+    navigate(`/detail/${itemId}`);
+  };
+
   return (
     <div className="container mx-auto p-6 bg-gradient-to-r from-blue-50 to-indigo-100 rounded-lg shadow-md mt-8 mb-8">
       {/* Dropdowns */}
@@ -130,7 +136,11 @@ const Item = () => {
       ) : (
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => (
-            <Itemcardone key={item._id} item={item} />
+            <Itemcardone 
+            key={item._id} 
+            item={item}
+            onClick={() => handleViewTicket(item._id)}
+             />
           ))}
         </div>
       )}

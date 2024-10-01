@@ -13,17 +13,17 @@ const borrowRequestSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
          ref: 'User', 
          required: true },   // Reference to the user lending the item
-    requestedDates: {
-      fromDate: { 
-        type: Date,
-        required: true },
-      toDate: { 
-        type: Date, 
-        required: true }
-    },
+//     requestedDates: {
+//       fromDate: { 
+//         type: Date,
+//         required: true },
+//       toDate: { 
+//         type: Date, 
+//         required: true }
+//     },
     status: { 
         type: String,
-        enum: ['pending', 'approved', 'rejected', 'borrowed', 'returned'],
+        enum: ['pending', 'approved', 'rejected', 'returned', 'returnedcheck'],
          default: 'pending' }, // Status of the request
     requestDate: {
          type: Date,

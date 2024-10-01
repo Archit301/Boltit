@@ -118,6 +118,12 @@ const Navbar = () => {
               >
                 My Item
               </Link>
+              <Link
+                to="/cart"
+                className="hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
+              >
+                Cart
+              </Link>
               </> ):('')}
               {currentUser ? (
               <>
@@ -229,6 +235,14 @@ const Navbar = () => {
               className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 transition-all duration-200"
             >
               My Item
+            </Link>
+
+            <Link
+              to="/cart"
+              onClick={() => setIsOpen(false)}
+              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 transition-all duration-200"
+            >
+              Cart
             </Link>
             </>  ):('')}
         { currentUser ? (
