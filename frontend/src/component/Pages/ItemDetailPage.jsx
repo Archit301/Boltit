@@ -203,7 +203,7 @@ try {
               <button  onClick={handlerent}
                  disabled={bool1}
                 className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium rounded-lg hover:from-blue-600 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 transition">
-             { bool1?"Request Item ":"Requested"}
+             { bool1?"Requested ":"Request Item"}
               </button>
               </>):('')
 }
