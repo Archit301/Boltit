@@ -19,6 +19,7 @@ import ItemCard from './component/ItemCard'
 import UpdateItempage from './component/Pages/UpdateItempage'
 import Item from './component/Item'
 import Cart from './component/Pages/Cart'
+import BorrrowHistory from './component/Pages/BorrrowHistory'
 
 
 
@@ -50,6 +51,7 @@ function App() {
         <Route path='/cart'  element={<Cart/>}/>
         <Route path='/itemcard'  element={<ItemCard/>}/>
         <Route path='/contact'  element={<Contact/>}/>
+        <Route path='/borrow-history' element={<BorrrowHistory/>}/>
               </Routes>
               </main>
 <Footer />

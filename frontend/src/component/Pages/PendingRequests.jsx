@@ -10,7 +10,7 @@ const PendingRequests = () => {
   useEffect(() => {
     const pendinglist = async () => {
       try {
-        const res = await fetch(`/backend/request/pending/66f6e2e4b469530995123480`);
+        const res = await fetch(`/backend/request/pending/${currentUser._id}`);
         const data = await res.json();
         setPendingRequests(data);
         console.log(data);

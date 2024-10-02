@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { Item } from "../models/item_model.js"
 import { BorrowRequest } from "../models/borrowRequest_model.js";
 import Cart from "../models/Cart_model.js";
+import { approveRequestNotification, declineRequestNotification, returnReminder } from "./notification_controller.js";
+
 
 export const Additem=async(req,res,next)=>{
     try {
@@ -14,14 +16,19 @@ export const Additem=async(req,res,next)=>{
 }
 
 
-export const updateitem=async(req,res,next)=>{
-    try {
-        const updateitem=await Item.findByIdAndUpdat(  req.body,{$new:true})
-        res.status(200).json("Item Update Sucessfully");
-    } catch (error) {
-        next(error);
-    }
-}
+export const updateitem = async (req, res, next) => {
+  try {
+      const updateitem = await Item.findByIdAndUpdate(
+          req.body.id, // Assuming the item's ID is passed in the URL
+          req.body,      // The new data to update with
+          { new: true }  // To return the updated item
+      );
+      res.status(200).json("Item updated successfully");
+  } catch (error) {
+      next(error);
+  }
+};
+
 
 
 export const deleteitem=async(req,res,next)=>{
@@ -115,6 +122,9 @@ export const isAvailable =async(req,res,next)=>{
 export const rentitem=async(req,res,next)=>{
     const {itemId, borrowerId,lenderId}=req.body;
     try {
+      const item=await Item.find({_id:itemId})
+         item.borrowedrequest=borrowerId
+         await item.save();
         const rentitem=await new BorrowRequest(req.body)
         await rentitem.save()
         res.status(200).json("Request Send Successfully");
@@ -253,6 +263,7 @@ export const checkRequest = async (req, res, next) => {
         item.itemId.isAvailable = false; // Set isAvailable to false (boolean)
         await item.itemId.save(); // Save the changes to the itemId document
         await item.save(); // Save the changes to the BorrowRequest document
+        await approveRequestNotification(item.borrowerId,item.itemId)
         return res.status(200).json("Request successfully approved and item marked as unavailable.");
       } else {
         return res.status(404).json('Item not found'); // Return a 404 status if the item is not found
@@ -268,6 +279,7 @@ export const checkRequest = async (req, res, next) => {
     const {id}=req.body;
     try {
      const item=await BorrowRequest.findByIdAndDelete({_id:id})
+     await declineRequestNotification(item.borrowerId,item.itemId)
      res.status(200).json("Request declined")   
     } catch (error) {
         next(error)
@@ -281,6 +293,7 @@ export const checkRequest = async (req, res, next) => {
     if (item) {
       item.status = "returned"; 
       await item.save();
+      await returnReminder(item.lenderId,item.itemId)
       return res.status(200).json("Item successfully removed");
     } else {
       return res.status(404).json('Item not found'); 
@@ -290,7 +303,7 @@ export const checkRequest = async (req, res, next) => {
   }
   }
 
-  export const returncheckrequest=async()=>{
+  export const returncheckrequest=async(req,res,next)=>{
     const {id}=req.body;
  try {
     const item = await BorrowRequest.findById(id).populate('itemId')
@@ -306,4 +319,37 @@ export const checkRequest = async (req, res, next) => {
   } catch (error) {
     next(error); 
   }
+  }
+
+
+
+  export const lentitemrequest=async(req,res,next)=>{
+    const {lenderId}=req.params
+    try {
+        const item=await BorrowRequest.find({lenderId,status:"returnedcheck"}).populate('itemId')
+        res.status(200).json(item);    
+    } catch (error) {
+        next(error)
+    }
+  }
+
+
+  export const allborroweditem=async(req,res,next)=>{
+    const {borrowerId}=req.params
+    try {
+      const item=await Item.find({borrowRequests:borrowerId})
+      res.status(200).json(item); 
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  export const edititem=async(req,res,next)=>{
+    const {id}=req.body
+    try {
+      const item=await Item.find({_id:id})
+      res.status(200).json(item); 
+    } catch (error) {
+      next(error)
+    }
   }

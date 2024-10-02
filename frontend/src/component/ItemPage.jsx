@@ -85,7 +85,7 @@ function ItemPage() {
           </button>):('')
 }
           {/* Category Dropdown */}
-          <div className="w-full md:w-auto">
+          {/* <div className="w-full md:w-auto">
             <label htmlFor="category" className="block text-lg font-semibold text-gray-700 mb-2">
               Category
             </label>
@@ -101,7 +101,7 @@ function ItemPage() {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
         </div>
 
         {/* Items List */}

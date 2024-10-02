@@ -1,5 +1,6 @@
 import express from "express"
-import { acceptrequest, borrowedrequest, declinerequest, lentrequest, pendingitemlist, returncheckrequest, returnrequest } from "../controller/item_controller.js";
+import { acceptrequest, allborroweditem, borrowedrequest, declinerequest, lentitemrequest, lentrequest, pendingitemlist, returncheckrequest, returnrequest } from "../controller/item_controller.js";
+
 
 
 const router=express.Router()
@@ -11,4 +12,6 @@ router.post('/accept',acceptrequest)
 router.post('/decline',declinerequest)
 router.post('/request',returnrequest)
 router.post('/checkrequest',returncheckrequest)
+router.get('/lentitemrequest/:lenderId',lentitemrequest)
+router.get('/borrow/:borrowerId',allborroweditem)
 export default router

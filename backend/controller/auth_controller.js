@@ -191,43 +191,52 @@ export const updateUser = async (req, res, next) => {
 
 export const searchNearbyUsers = async (req, res, next) => {
   try {
-    const { longitude, latitude, searchItem, distance=50000 } = req.body;
+    const { longitude, latitude, searchItem } = req.body;
+    let distance = 50000; // Default distance of 50,000 meters (50 km)
 
     // Validate the request body
-    if (!longitude || !latitude || !searchItem || !distance) {
-      return res.status(400).json({ message: 'Longitude, latitude, search item, and distance are required.' });
+    if (!longitude || !latitude || !searchItem) {
+      return res.status(400).json({ message: 'Longitude, latitude, and search item are required.' });
     }
 
-    // Geospatial query to find users near the given location
-    const nearbyUsersWithItems = await User.aggregate([
-      {
-        $geoNear: {
-          near: {
-            type: 'Point',
-            coordinates: [longitude, latitude], // User's location from request body
+    let nearbyUsersWithItems = [];
+
+    // Repeat the query until we find users or we have searched in a sufficiently large radius
+    while (nearbyUsersWithItems.length === 0 && distance <= 500000) { // limit search to 500,000 meters (500 km)
+      // Geospatial query to find users near the given location within the current distance
+      nearbyUsersWithItems = await User.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: 'Point',
+              coordinates: [longitude, latitude], // User's location from request body
+            },
+            distanceField: 'distance', // Field to store calculated distance
+            maxDistance: distance * 1000, // Current search distance in meters
+            spherical: true, // Use spherical calculations for accuracy
           },
-          distanceField: 'distance', // Field to store calculated distance
-          maxDistance: 500000000, // Predefined maximum distance from request
-          spherical: true, // Use spherical calculations for accuracy
         },
-      },
-      {
-        $lookup: {
-          from: 'items', // Name of the Item collection
-          localField: '_id', // User's unique ID field in User collection
-          foreignField: 'userId', // Field in Item collection that relates to the User
-          as: 'items', // Alias for the joined data
+        {
+          $lookup: {
+            from: 'items', // Name of the Item collection
+            localField: '_id', // User's unique ID field in User collection
+            foreignField: 'userId', // Field in Item collection that relates to the User
+            as: 'items', // Alias for the joined data
+          },
         },
-      },
-      {
-        $match: {
-          'itemsName': searchItem, // Filter users whose items include the search item
+        {
+          $match: {
+            'items.itemName': searchItem, // Check if the user's items contain the searchItem
+          },
         },
-      },
-      {
-        $limit: 10, // Limit the number of results to avoid too many responses
-      },
-    ]);
+        {
+          $limit: 10, // Limit the number of results to avoid too many responses
+        },
+      ]);
+
+      // If no users are found within the current distance, increase the distance for the next iteration
+      distance += 50000; // Increase by 50,000 meters (50 km) in each iteration
+    }
 
     // Check if any users are found with the searched item
     if (nearbyUsersWithItems.length === 0) {

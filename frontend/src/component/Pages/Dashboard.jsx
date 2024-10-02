@@ -3,6 +3,7 @@ import React from 'react';
 import BorrowedItemsList from './BorrowedItemsList';
 import LentItemsList from './LentItemsList';
 import PendingRequests from './PendingRequests';
+import LentItemRequest from './LentItemRequest';
 
 const Dashboard = () => {
   return (
@@ -19,6 +20,11 @@ const Dashboard = () => {
         <div className="bg-white shadow-lg hover:shadow-xl transition-shadow rounded-lg p-6">
           <h2 className="text-2xl font-semibold text-green-600 mb-4">Lent Items</h2>
           <LentItemsList />
+        </div>
+
+        <div className="col-span-1 md:col-span-2 lg:col-span-1 bg-white shadow-lg hover:shadow-xl transition-shadow rounded-lg p-6">
+          <h2 className="text-2xl font-semibold text-red-600 mb-4">Lent Item Requests</h2>
+           <LentItemRequest /> 
         </div>
 
         {/* Pending Requests Section */}

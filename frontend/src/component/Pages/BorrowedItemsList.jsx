@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 const BorrowedItemsList = () => {
   const [borrowedItems, setBorrowedItems] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
+  const [refresh, setRefresh] = useState(false);
 
   // Fetch data from backend
   useEffect(() => {
@@ -19,7 +20,25 @@ const BorrowedItemsList = () => {
       }
       }
       pendinglist();
-  }, []);
+  }, [refresh]);
+
+  const Request = async (id) => {
+    try {
+      const res = await fetch(`/backend/request/request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }), // Send the request ID as an object
+      });
+      const data = await res.json();
+      console.log(data);
+      setRefresh(!refresh); // Toggle refresh to trigger useEffect
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   const RequestDateComponent = ({ requestDate }) => {
     const date = new Date(requestDate);
@@ -46,7 +65,8 @@ const BorrowedItemsList = () => {
             <div>
               <h3 className="font-semibold text-lg text-gray-700">{item.itemId.itemName}</h3>
               <p className="text-sm text-gray-500">Due Date: <span className="font-medium"><RequestDateComponent requestDate={item.itemId.toDate} /></span></p>
-              <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+              <button  onClick={() => Request(item._id)}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
                 Return Item
               </button>
             </div>

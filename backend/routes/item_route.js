@@ -1,5 +1,5 @@
 import express from "express"
-import { Additem, allitemlisting, cartitem, cartitemlist, checkcartitem, checkRequest, deleteitem, deleteitemlist, isAvailable, itemdetail, itemlisting, ownerid, pendingitemlist, rentitem, requestitem, withoutloginallitemlisting } from "../controller/item_controller.js"
+import { Additem, allitemlisting, cartitem, cartitemlist, checkcartitem, checkRequest, deleteitem, deleteitemlist, edititem, isAvailable, itemdetail, itemlisting, ownerid, pendingitemlist, rentitem, requestitem, updateitem, withoutloginallitemlisting } from "../controller/item_controller.js"
 
 const router=express.Router()
 router.post('/additem',Additem)
@@ -17,5 +17,6 @@ router.get('/:user/:item',checkcartitem)
 router.get('/:user', cartitemlist);
 router.post('/deletebyId',deleteitemlist );
 router.get('/pending/:lenderId', pendingitemlist);
-
+router.post('/edititem',edititem)
+router.post('/updateitem',updateitem)
 export default router;

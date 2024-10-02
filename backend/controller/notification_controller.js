@@ -84,7 +84,7 @@ export const getNotifications = async (req, res) => {
   
   // Return item reminder
   export const returnReminder = async (userId, itemName) => {
-    const message = `Reminder: Please return the item ${itemName}.`;
+    const message = `Reminder: Item Returned check ${itemName}.`;
     await createNotification({ userId, type: 'reminder', message });
   };
   

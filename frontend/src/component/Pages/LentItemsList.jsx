@@ -47,9 +47,7 @@ const LentItemsList = () => {
             <div>
               <h3 className="font-semibold text-lg text-gray-700">{item.itemId.itemName}</h3>
               <p className="text-sm text-gray-500">Return Date: <span className="font-medium"><RequestDateComponent requestDate={item.itemId.toDate} /></span></p>
-              <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
-                Mark as Returned
-              </button>
+             
             </div>
           </div>
         </li>
