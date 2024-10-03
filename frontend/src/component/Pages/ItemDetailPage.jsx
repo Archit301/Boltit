@@ -174,20 +174,27 @@ const ItemDetailPage = () => {
   };
 
   // Handle Next Image
-  const handleNext = () => {
-    if (!item || !item.images || item.images.length === 0) return;
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === item.images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
+ // Handle Next Image
+const handleNext = () => {
+  // Ensure that item is defined and contains images
+  if (!item || !item[0].images || item[0].images.length === 0) return;
 
-  // Handle Previous Image
-  const handlePrev = () => {
-    if (!item || !item.images || item.images.length === 0) return;
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? item.images.length - 1 : prevIndex - 1
-    );
-  };
+  // Set the current image index to the next one, wrapping around if at the end
+  setCurrentImageIndex((prevIndex) =>
+    prevIndex === item[0].images.length - 1 ? 0 : prevIndex + 1
+  );
+};
+
+// Handle Previous Image
+const handlePrev = () => {
+  // Ensure that item is defined and contains images
+  if (!item || !item[0].images || item[0].images.length === 0) return;
+
+  // Set the current image index to the previous one, wrapping around if at the start
+  setCurrentImageIndex((prevIndex) =>
+    prevIndex === 0 ? item[0].images.length - 1 : prevIndex - 1
+  );
+};
 
   // Redirect to login if currentUser is null (Optional)
   useEffect(() => {
