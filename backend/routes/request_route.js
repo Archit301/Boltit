@@ -1,10 +1,10 @@
 import express from "express"
-import { acceptrequest, allborroweditem, borrowedrequest, declinerequest, lentitemrequest, lentrequest, pendingitemlist, returncheckrequest, returnrequest } from "../controller/item_controller.js";
+import { acceptrequest, allborroweditem, borrowedrequest, checkRequest, declinerequest, lentitemrequest, lentrequest, pendingitemlist, returncheckrequest, returnrequest } from "../controller/item_controller.js";
 
 
 
 const router=express.Router()
-
+router.get('/:itemId/:lenderId/:borrowerId', checkRequest);
 router.get('/pending/:lenderId', pendingitemlist);
 router.get('/borrowed/:borrowerId',borrowedrequest)
 router.get('/lender/:lenderId',lentrequest)

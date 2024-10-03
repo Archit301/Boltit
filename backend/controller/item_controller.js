@@ -119,19 +119,40 @@ export const isAvailable =async(req,res,next)=>{
     }
 }
 
-export const rentitem=async(req,res,next)=>{
-    const {itemId, borrowerId,lenderId}=req.body;
-    try {
-      const item=await Item.find({_id:itemId})
-         item.borrowedrequest=borrowerId
-         await item.save();
-        const rentitem=await new BorrowRequest(req.body)
-        await rentitem.save()
-        res.status(200).json("Request Send Successfully");
-    } catch (error) {
-       next(error) 
+export const rentitem = async (req, res, next) => {
+  const { itemId, borrowerId, lenderId } = req.body;
+  try {
+    // Find the item by ID
+    const item = await Item.findById(itemId);
+    
+    // Check if the item exists
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
     }
-}
+
+    // Add the borrowerId to the borrowedrequest field
+    item.borrowedrequest = borrowerId;
+    
+    // Save the updated item
+    await item.save();
+
+    // Create a new borrow request entry
+    const rentItem = new BorrowRequest({
+      itemId,
+      borrowerId,
+      lenderId,
+    });
+
+    // Save the borrow request to the database
+    await rentItem.save();
+
+    // Respond with success message
+    res.status(200).json("Request sent successfully");
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
+};
 
 
 
@@ -146,15 +167,15 @@ export const ownerid=async(req,res,next)=>{
 }
 
 export const checkRequest = async (req, res, next) => {
-    const { lenderId, borrowerId, itemId } = req.params;
-  
+    const {itemId, lenderId, borrowerId } = req.params;
+   // console.log(req.params)
     // console.log("lenderId: ", lenderId);  // Add a log to debug
     try {
       const request = await BorrowRequest.find({ lenderId, borrowerId, itemId });
       
-      if (!request || request.length === 0) {
-        return res.status(404).json({ message: 'No request found' });
-      }
+      // if (!request || request.length === 0) {
+      //   return res.status(404).json({ message: 'No request found' });
+      // }
   
       res.status(200).json(request);
     } catch (error) {

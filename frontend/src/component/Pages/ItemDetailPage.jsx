@@ -30,8 +30,11 @@ const ItemDetailPage = () => {
     const checkcart=async()=>{
       try {
         const res=await fetch(`/backend/item/${borrowerId}/${itemId}`)
-        if(res.ok)
+        const data=await res.json()
+        if (Array.isArray(data) && data.length > 0) {
+          console.log(data)
           setbool2(true)
+        }
       } catch (error) {
         console.log(error)
       }
@@ -43,9 +46,10 @@ const ItemDetailPage = () => {
     const checkRequest=async()=>{
    try {
     const res=await fetch(`/backend/item/${itemId}/${lenderId}/${borrowerId}`)
-    console.log(res);
-    if(res.ok)
+    const data=await res.json()
+    if (Array.isArray(data) && data.length > 0) {
       setbool1(true)
+    }
    } catch (error) {
     console.log(error)
    }
