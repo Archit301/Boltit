@@ -3,6 +3,8 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { useSelector } from 'react-redux';
 import { app } from '../../firebase';
 import { useParams } from 'react-router';
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css';
 
 const UpdateItempage = () => {
     const { itemId } = useParams();
@@ -143,6 +145,16 @@ const UpdateItempage = () => {
             }
 
             const result = await response.json();
+            Toastify({
+                text: "Item Updated successfully!",
+                duration: 3000, // Duration in milliseconds
+                gravity: "top", // 'top' or 'bottom'
+                position: 'center', // 'left', 'center', or 'right'
+                backgroundColor: "blue", // Background color of the toast
+                className: "info", // Optional class for custom styling
+                close: true, // Show close button
+                onClick: function() {} // Callback after click
+              }).showToast();
             console.log('Item updated successfully:', result);
             // Redirect or provide success feedback
         } catch (err) {
