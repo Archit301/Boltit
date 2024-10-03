@@ -301,6 +301,7 @@ export const checkRequest = async (req, res, next) => {
     try {
      const item=await BorrowRequest.findByIdAndDelete({_id:id})
      await declineRequestNotification(item.borrowerId,item.itemId)
+     console.log(item)
      res.status(200).json("Request declined")   
     } catch (error) {
         next(error)
@@ -347,7 +348,7 @@ export const checkRequest = async (req, res, next) => {
   export const lentitemrequest=async(req,res,next)=>{
     const {lenderId}=req.params
     try {
-        const item=await BorrowRequest.find({lenderId,status:"returnedcheck"}).populate('itemId')
+        const item=await BorrowRequest.find({lenderId,status:"returned"}).populate('itemId')
         res.status(200).json(item);    
     } catch (error) {
         next(error)

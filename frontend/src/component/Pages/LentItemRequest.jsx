@@ -35,6 +35,20 @@ const LentItemRequest = () => {
           console.log(error);
         }
       };
+      const RequestDateComponent = ({ requestDate }) => {
+        const date = new Date(requestDate);
+      
+        // Check if the date conversion is valid
+        let formattedDate;
+        if (!isNaN(date.getTime())) {
+          // Use toLocaleTimeString for local time format
+          formattedDate = date.toLocaleDateString(); // e.g., "1:00 PM"
+        } else {
+          formattedDate = 'Invalid date'; // Handle invalid date case
+        }
+      
+        return <span className="font-medium">{formattedDate}</span>;
+      };
   return (
     <ul className="space-y-6">
     {lentItems.map(item => (
