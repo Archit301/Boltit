@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import {getDownloadURL,getStorage,ref,uploadBytesResumable} from 'firebase/storage'
 import { app } from '../../firebase';
-
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css';
 const AddItemPage = () => {
     const { currentUser } = useSelector((state) => state.user);
     const [formData, setFormData] = useState({
@@ -99,6 +100,14 @@ const AddItemPage = () => {
                 body: JSON.stringify(dataToSend),
             });
             const data = await res.json();
+            Toastify({
+                text: "Item Added Successfuly",
+                duration: 3000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+              }).showToast();
             console.log(data);
         } catch (error) {
             console.log(error);    

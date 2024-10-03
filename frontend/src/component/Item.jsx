@@ -1,24 +1,24 @@
+// components/Item.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Itemcardone from './Itemcardone';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom'; // Ensure correct import
 
 const categories = ['All', 'Electronics', 'Books', 'Clothing', 'Home', 'Sports'];
 const sortOptions = [
-  { value: 'asc', label: 'Price: Low to High' },
-  { value: 'desc', label: 'Price: High to Low' },
+  { value: 'lowToHigh', label: 'Price: Low to High' },
+  { value: 'highToLow', label: 'Price: High to Low' },
 ];
 
 const Item = () => {
   const [items, setItems] = useState([]); // Items fetched from backend
   const [category, setCategory] = useState('All'); // Selected category
-  const [sortOrder, setSortOrder] = useState('asc'); // Selected sort order
+  const [sortOrder, setSortOrder] = useState('lowToHigh'); // Selected sort order
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate(); // Use navigate at the top level
-
 
   // Function to fetch items from the backend with sorting and filtering
   const fetchItems = async () => {
@@ -26,28 +26,35 @@ const Item = () => {
       setLoading(true);
       setError(null);
 
-      // Prepare query parameters
-      const params = {};
-      if (category !== 'All') {
-        params.category = category;
-      }
-      if (sortOrder) {
-        params.sort = sortOrder;
+      // Prepare the request payload
+      const payload = {
+        category,
+        sortOrder,
+      };
+
+      // Include userId if the user is logged in
+      if (currentUser && currentUser._id) {
+        payload.userId = currentUser._id;
       }
 
-      // Make GET request to the backend with query parameters
-      if(currentUser){
-      const response = await axios.get(`/backend/item/allitem/${currentUser._id}`, { params });
-      setItems(response.data);
-    }
-      else{
-        const response=await axios.get('/backend/item/withloginlistitem')
-        setItems(response.data);
-      }
-      // Set items with the fetched data
+      // Make POST request to the new backend endpoint with the payload
+      const response = await axios.post('/backend/request/default', payload);
+
+      // Assuming the backend returns the items in response.data.data
+      setItems(response.data.data);
     } catch (err) {
       console.error('Error fetching items:', err);
-      setError('Failed to fetch items.');
+      // Handle different error scenarios
+      if (err.response) {
+        // Server responded with a status other than 2xx
+        setError(err.response.data.message || 'Failed to fetch items.');
+      } else if (err.request) {
+        // Request was made but no response received
+        setError('No response from server. Please try again later.');
+      } else {
+        // Something else happened while setting up the request
+        setError('An unexpected error occurred.');
+      }
     } finally {
       setLoading(false); // Ensure loading is set to false after try/catch
     }
@@ -81,7 +88,6 @@ const Item = () => {
       </div>
     );
   }
-
 
   const handleViewTicket = (itemId) => {
     navigate(`/detail/${itemId}`);
@@ -137,10 +143,10 @@ const Item = () => {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => (
             <Itemcardone 
-            key={item._id} 
-            item={item}
-            onClick={() => handleViewTicket(item._id)}
-             />
+              key={item._id} 
+              item={item}
+              onClick={() => handleViewTicket(item._id)}
+            />
           ))}
         </div>
       )}

@@ -1,22 +1,30 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
 const ItemDetailPage = () => {
   const { itemId } = useParams();
-  const [item, setItem] = useState([]);
+  const [item, setItem] = useState(null); // Initialize as null for better null handling
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { currentUser } = useSelector((state) => state.user);
-   const [bool,setbool]=useState(false)
-   const [bool1,setbool1]=useState(false)
-   const [bool2,setbool2]=useState(false)
-   const [lenderId, setLenderId] = useState('');
-   const borrowerId=currentUser._id
+  const [bool, setBool] = useState(false);
+  const [bool1, setBool1] = useState(false);
+  const [bool2, setBool2] = useState(false);
+  const [lenderId, setLenderId] = useState('');
+  const navigate = useNavigate(); // For potential redirection
+
+  // Determine borrowerId only if currentUser exists
+  const borrowerId = currentUser ? currentUser._id : null;
+
+  // Fetch Item Details
   useEffect(() => {
     const fetchItemDetails = async () => {
       try {
         const res = await fetch(`/backend/item/itemdetail/${itemId}`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch item details");
+        }
         const data = await res.json();
         setItem(data);
       } catch (error) {
@@ -26,133 +34,170 @@ const ItemDetailPage = () => {
     fetchItemDetails();
   }, [itemId]);
 
-  useEffect(()=>{
-    const checkcart=async()=>{
+  // Check Cart Status
+  useEffect(() => {
+    if (!borrowerId) return; // Exit if borrowerId is not available
+
+    const checkCart = async () => {
       try {
-        const res=await fetch(`/backend/item/${borrowerId}/${itemId}`)
-        const data=await res.json()
+        const res = await fetch(`/backend/item/${borrowerId}/${itemId}`);
+        if (!res.ok) {
+          throw new Error("Failed to check cart");
+        }
+        const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          console.log(data)
-          setbool2(true)
+          console.log(data);
+          setBool2(true);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
-    checkcart()
-  },[])
+    };
+    checkCart();
+  }, [itemId, borrowerId]);
 
-  useEffect(()=>{
-    const checkRequest=async()=>{
-   try {
-    const res=await fetch(`/backend/item/${itemId}/${lenderId}/${borrowerId}`)
-    const data=await res.json()
-    if (Array.isArray(data) && data.length > 0) {
-      setbool1(true)
-    }
-   } catch (error) {
-    console.log(error)
-   }
-    }
-    checkRequest();
-  },[itemId,borrowerId,lenderId])
+  // Check Request Status
+  useEffect(() => {
+    if (!borrowerId || !lenderId) return; // Exit if borrowerId or lenderId is not available
 
-  useEffect(()=>{
-    const checkrent=async()=>{
-try {
-  const res=await fetch(`/backend/item/available/${itemId}`)
-   const data=await res.json();
-   if(data)
-   {
-    setbool(true)
-   }
-} catch (error) {
-  console.log(error)
-}
-    }
-    checkrent()
-  },[itemId])
-
-
-  
-  useEffect(()=>{
-    const owner=async()=>{
+    const checkRequest = async () => {
       try {
-    const res=await fetch(`/backend/item/owner/${itemId}`)
-     const data=await res.json();
-     console.log(data.ownerId)
-    setLenderId(data.ownerId)
+        const res = await fetch(`/backend/item/${itemId}/${lenderId}/${borrowerId}`);
+        if (!res.ok) {
+          throw new Error("Failed to check request");
+        }
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0 && data[0].status !== "returnedcheck") {
+          setBool1(true);
+        }
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
+    };
+    checkRequest();
+  }, [itemId, borrowerId, lenderId]);
+
+  // Check Rent Availability
+  useEffect(() => {
+    const checkRent = async () => {
+      try {
+        const res = await fetch(`/backend/item/available/${itemId}`);
+        if (!res.ok) {
+          throw new Error("Failed to check rent availability");
+        }
+        const data = await res.json();
+        if (data) {
+          setBool(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    checkRent();
+  }, [itemId]);
+
+  // Fetch Owner Information
+  useEffect(() => {
+    const fetchOwner = async () => {
+      try {
+        const res = await fetch(`/backend/item/owner/${itemId}`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch owner information");
+        }
+        const data = await res.json();
+        console.log(data.ownerId);
+        setLenderId(data.ownerId);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchOwner();
+  }, [itemId]);
+
+  // Handle Rent Request
+  const handleRent = async () => {
+    if (!borrowerId) {
+      alert("You must be logged in to rent an item.");
+      return;
     }
-    owner()
-  },[itemId])
 
- const handlerent=async()=>{
-  try {
-    const res=await fetch('/backend/item/rentitem', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        itemId: itemId,
-        lenderId: lenderId,
-        borrowerId: borrowerId
-      }),
-    });
+    try {
+      const res = await fetch('/backend/item/rentitem', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          itemId: itemId,
+          lenderId: lenderId,
+          borrowerId: borrowerId
+        }),
+      });
 
-    const data = await res.json(); 
-    console.log(data);
-    if(res.ok)
-    {
-      setbool1(true)
+      const data = await res.json();
+      console.log(data);
+      if (res.ok) {
+        setBool1(true);
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error)
-  }
- }
+  };
 
-
- const addcart=async()=>{
-  try {
-    const res=await fetch('/backend/item/cart', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        item: itemId,
-        user: borrowerId
-      }),
-    });
-
-    const data = await res.json(); 
-    console.log(data);
-    if(res.ok)
-    {
-      setbool2(true)
+  // Handle Add to Cart
+  const addToCart = async () => {
+    if (!borrowerId) {
+      alert("You must be logged in to add items to the cart.");
+      return;
     }
-  } catch (error) {
-    console.log(error)
-  }
- }
 
+    try {
+      const res = await fetch('/backend/item/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          item: itemId,
+          user: borrowerId
+        }),
+      });
 
+      const data = await res.json();
+      console.log(data);
+      if (res.ok) {
+        setBool2(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Handle Next Image
   const handleNext = () => {
+    if (!item || !item.images || item.images.length === 0) return;
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === item[0].images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === item.images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
+  // Handle Previous Image
   const handlePrev = () => {
+    if (!item || !item.images || item.images.length === 0) return;
     setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? item[0].images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? item.images.length - 1 : prevIndex - 1
     );
   };
 
-  if (!item.length) {
+  // Redirect to login if currentUser is null (Optional)
+  useEffect(() => {
+    if (currentUser === null) {
+      // Uncomment the next line to enable redirection
+      // navigate('/login');
+    }
+  }, [currentUser, navigate]);
+
+  if (item === null) {
     return <div className="text-center text-gray-600">Loading...</div>;
   }
 
@@ -204,24 +249,47 @@ try {
             </div>
 
             {/* Action Buttons */}
-            {(currentUser._id != item[0].ownerId)?
-            (
-            <div className="flex space-x-4 mb-6">
-              { bool?(<>
-              <button  onClick={handlerent}
-                 disabled={bool1}
-                className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium rounded-lg hover:from-blue-600 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 transition">
-             { bool1?"Requested ":"Request Item"}
-              </button>
-              </>):('')
-}
-              <button onClick={addcart}
-              disabled={bool2}
-              className="w-full px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-800 text-white font-medium rounded-lg hover:from-gray-700 hover:to-gray-900 focus:ring-2 focus:ring-gray-500 transition">
-             {bool2? "Added to cart":"Add to cart"}
-              </button>
-            </div>) :('')
-}
+            {currentUser && currentUser._id !== item.ownerId && (
+              <div className="flex space-x-4 mb-6">
+                {bool && (
+                  <button
+                    onClick={handleRent}
+                    disabled={bool1}
+                    className={`w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium rounded-lg transition ${
+                      bool1
+                        ? "from-blue-400 to-blue-500 cursor-not-allowed"
+                        : "hover:from-blue-600 hover:to-blue-800"
+                    }`}
+                  >
+                    {bool1 ? "Requested" : "Request Item"}
+                  </button>
+                )}
+                <button
+                  onClick={addToCart}
+                  disabled={bool2}
+                  className={`w-full px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-800 text-white font-medium rounded-lg transition ${
+                    bool2
+                      ? "from-gray-500 to-gray-700 cursor-not-allowed"
+                      : "hover:from-gray-700 hover:to-gray-900"
+                  }`}
+                >
+                  {bool2 ? "Added to Cart" : "Add to Cart"}
+                </button>
+              </div>
+            )}
+
+            {/* Prompt to Log In */}
+            {!currentUser && (
+              <div className="text-center">
+                <p className="text-gray-600 mb-4">Please log in to interact with this item.</p>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition"
+                >
+                  Log In
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

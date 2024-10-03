@@ -23,17 +23,11 @@ const BorrowHistory = () => {
 
         const data = await response.json();
 
-        console.log('Cart items data:', data);
+        console.log('Cart items data:', data[0].itemName);
 
         if (Array.isArray(data)) {
-          setCartItems(
-            data.map((cartItem) => ({
-              _id: cartItem._id,
-              itemName: cartItem.item?.itemName || 'Unknown Item', // Handle undefined itemName
-              price: cartItem.item?.price || 0, // Handle undefined price
-              images: cartItem.item?.images[0] || 'https://via.placeholder.com/150', // Default image
-            }))
-          );
+          setCartItems(data)
+          
         } else {
           console.error('Unexpected data structure:', data);
         }
@@ -64,7 +58,7 @@ const BorrowHistory = () => {
               >
                 <div className="flex items-center">
                   <img
-                    src={item.images} // Ensure the first image is displayed or fallback
+                    src={item.images[0]||'https://via.placeholder.com/150'} // Ensure the first image is displayed or fallback
                     alt={item.itemName}
                     className="w-28 h-28 object-cover rounded-md mr-4 shadow"
                   />

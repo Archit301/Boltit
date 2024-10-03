@@ -131,7 +131,7 @@ export const rentitem = async (req, res, next) => {
     }
 
     // Add the borrowerId to the borrowedrequest field
-    item.borrowedrequest = borrowerId;
+    item.borrowRequests = borrowerId;
     
     // Save the updated item
     await item.save();
@@ -284,7 +284,8 @@ export const checkRequest = async (req, res, next) => {
         item.itemId.isAvailable = false; // Set isAvailable to false (boolean)
         await item.itemId.save(); // Save the changes to the itemId document
         await item.save(); // Save the changes to the BorrowRequest document
-        await approveRequestNotification(item.borrowerId,item.itemId)
+        console.log()
+        await approveRequestNotification(item.borrowerId,item.itemId.itemName)
         return res.status(200).json("Request successfully approved and item marked as unavailable.");
       } else {
         return res.status(404).json('Item not found'); // Return a 404 status if the item is not found
@@ -299,9 +300,9 @@ export const checkRequest = async (req, res, next) => {
   export const declinerequest=async(req,res,next)=>{
     const {id}=req.body;
     try {
-     const item=await BorrowRequest.findByIdAndDelete({_id:id})
-     await declineRequestNotification(item.borrowerId,item.itemId)
-     console.log(item)
+     const item=await BorrowRequest.findByIdAndDelete({_id:id}).populate('itemId')
+     await declineRequestNotification(item.borrowerId,item.itemId.itemName)
+    //  console.log(item.itemId)
      res.status(200).json("Request declined")   
     } catch (error) {
         next(error)
@@ -311,11 +312,11 @@ export const checkRequest = async (req, res, next) => {
   export const returnrequest=async(req,res,next)=>{
  const {id}=req.body;
  try {
-    const item = await BorrowRequest.findById(id)
+    const item = await BorrowRequest.findById(id).populate('itemId')
     if (item) {
       item.status = "returned"; 
       await item.save();
-      await returnReminder(item.lenderId,item.itemId)
+      await returnReminder(item.lenderId,item.itemId.itemName)
       return res.status(200).json("Item successfully removed");
     } else {
       return res.status(404).json('Item not found'); 
@@ -375,3 +376,72 @@ export const checkRequest = async (req, res, next) => {
       next(error)
     }
   }
+
+
+  export const getAllItemsDefault = async (req, res) => {
+    try {
+      const items = await Item.find({})
+        .sort({ price: 1 }); 
+  
+      res.status(200).json(items);
+    } catch (error) {
+      console.error('Error fetching all items (default):', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server Error: Unable to fetch items.',
+      });
+    }
+  };
+
+
+
+  export const getItemsByCategoryAndSort = async (req, res) => {
+    try {
+        const { category = 'All', sortOrder = 'lowToHigh', userId } = req.body;
+
+        // Validate sort parameter
+        let sortOption;
+        if (sortOrder === 'highToLow') {
+            sortOption = { price: -1 };
+        } else if (sortOrder === 'lowToHigh') {
+            sortOption = { price: 1 };
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid sort option. Use "lowToHigh" or "highToLow".',
+            });
+        }
+
+        // Build the filter object
+        let filter = {};
+
+        // Optionally, include only available items
+        // Uncomment the next line if you want to display only available items by default
+        // filter.isAvailable = true;
+
+        if (category.toLowerCase() !== 'all') {
+            // Use case-insensitive regex for category matching
+            filter.category = { $regex: new RegExp(`^${category}$`, 'i') };
+        }
+
+        // If you want to handle user-specific logic, you can utilize userId here
+        // For example, exclude items owned by the current user
+        if (userId) {
+            filter.ownerId = { $ne: userId };
+        }
+
+        // Fetch items based on filter and sort options
+        const items = await Item.find(filter).sort(sortOption);
+
+        res.status(200).json({
+            success: true,
+            data: items,
+        });
+    } catch (error) {
+        console.error('Error fetching items by category and sort:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error: Unable to fetch items.',
+        });
+    }
+};
